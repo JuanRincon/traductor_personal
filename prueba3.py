@@ -2,7 +2,16 @@ from random import randint
 from prueba2 import eng,spa
 
 
-print("Welcome to english vocabulary")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+print("")
+print("##### Welcome to English Vocabulary #####")
+print("")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+print("")
+print("Your app to practice your personal vocabulary")
+print("")
+print("")
+
 
 def elige_pares():
 	b = randint(1, 111)
@@ -10,16 +19,17 @@ def elige_pares():
 		a = b
 		return(a)
 	else:
-		print("b es igual: ", b)
 		b -= 1
 		a = b
-		print("a es igual: ", a)
 		return(a)
+	return(lang)
 
 
 def select_lang():
-	print("1. for vocabulary english to spanish")
-	print("2. for vocabulary spanish to english")
+	print("  ##  Press:  ##")
+	print("")
+	print("|- 1 - for vocabulary english to spanish -|")
+	print("|- 2 - for vocabulary spanish to english -|")
 	sele = int(input(""))
 	if sele == 1:
 		lang = eng
@@ -27,14 +37,16 @@ def select_lang():
 		lang = spa
 	return(lang)
 
+lang = select_lang()
 
 def play_eng_esp():
 	tecla = ""
 	while (tecla !='x'):
-		lang = select_lang()
+		global lang
+		if (tecla == 'z'):
+			lang = select_lang()
 		a = elige_pares()
 		print("La palabra a traducir es: ")
-		print("En este caso a es igual: ", a)
 		d = str(lang[a])
 		#d = d[:-1]
 		print(d, "\n")
@@ -43,8 +55,9 @@ def play_eng_esp():
 			print("Correcto \n")
 		else:
 			print("Incorrecto.\nLa palabra correcta es: ", lang[a+1], "\n")
-		tecla = input("Ingrese x para salir: \n")
-		
+		print("Ingrese \"x\" para salir \"z\" para cambiar el lenguaje : ")
+		print("o presione otra letra para continuar \n")
+		tecla = input("")	
 
 if __name__=='__main__':
 	play_eng_esp()		
