@@ -1,6 +1,8 @@
 from random import randint
 from prueba2 import eng,spa
+from os import system as sys
 
+sys('clear')
 
 print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
 print("")
@@ -29,7 +31,8 @@ def select_lang():
 	print("  ##  Press:  ##")
 	print("")
 	print("|- 1 - for vocabulary english to spanish -|")
-	print("|- 2 - for vocabulary spanish to english -|")
+	print("|- 2 - for vocabulary spanish to english -|\n")
+
 	sele = int(input(""))
 	if sele == 1:
 		lang = eng
@@ -58,6 +61,7 @@ def play_eng_esp():
 		print("Ingrese \"x\" para salir \"z\" para cambiar el lenguaje : ")
 		print("o presione otra letra para continuar \n")
 		tecla = input("")	
+
 
 if __name__=='__main__':
 	play_eng_esp()		

@@ -1,4 +1,4 @@
-iden = open("Voc")
+iden = open("/mnt/d/DiscoExtraible/Estudio/Ingles/Vocabulario.txt")
 iden2 = open("Voc2")
 
 origEng = ""
