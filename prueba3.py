@@ -4,16 +4,17 @@ from os import system as sys
 
 sys('clear')
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-print("")
-print("##### Welcome to English Vocabulary #####")
-print("")
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-print("")
-print("Your app to practice your personal vocabulary")
-print("")
-print("")
 
+def welcome():
+	print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	print("")
+	print("##### Welcome to English Vocabulary #####")
+	print("")
+	print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	print("")
+	print("Your app to practice your personal vocabulary")
+	print("")
+	print("")
 
 def elige_pares():
 	b = randint(1, 111)
@@ -24,34 +25,36 @@ def elige_pares():
 		b -= 1
 		a = b
 		return(a)
-	return(lang)
-
+	return(cosa)
 
 def select_lang():
 	print("  ##  Press:  ##")
 	print("")
-	print("|- 1 - for vocabulary english to spanish -|")
-	print("|- 2 - for vocabulary spanish to english -|\n")
-
-	sele = int(input(""))
-	if sele == 1:
+	print("|- E - for vocabulary english to spanish -|")
+	print("|- S - for vocabulary spanish to english -|\n")
+	sele = input("")
+	#return(sele)
+	if (sele == 'e'):
 		lang = eng
-	else:
+	elif (sele == 'E'):
+		lang = eng
+	elif (sele == 's'):
 		lang = spa
+	elif (sele == 'S'):
+		lang = spa
+	else:
+		select_lang()
 	return(lang)
 
-lang = select_lang()
-
 def play_eng_esp():
+	lang = select_lang()
 	tecla = ""
 	while (tecla !='x'):
-		global lang
 		if (tecla == 'z'):
 			lang = select_lang()
 		a = elige_pares()
 		print("La palabra a traducir es: ")
 		d = str(lang[a])
-		#d = d[:-1]
 		print(d, "\n")
 		c = input("Ingrese la traducción: ")
 		if (lang[a+1] == c):
@@ -62,6 +65,9 @@ def play_eng_esp():
 		print("o presione otra letra para continuar \n")
 		tecla = input("")	
 
+def main():
+	welcome()
+	play_eng_esp()
 
 if __name__=='__main__':
-	play_eng_esp()		
+	main()		
