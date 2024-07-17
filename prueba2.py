@@ -1,14 +1,11 @@
 iden = open("/mnt/d/DiscoExtraible/Estudio/Ingles/Vocabulario.txt")
 
-origEng = ""
+eng = ""
 for i in iden: 
-	origEng += i
+	eng += i
 
 iden.close()
 
-# a es una variable tipo string
-eng = origEng
-
-# convertimos b de cadena a lista	
+# convertimos eng cadena a lista	
 eng = eng.split()
-
+print(eng)
