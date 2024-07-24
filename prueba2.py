@@ -8,4 +8,3 @@ iden.close()
 
 # convertimos eng cadena a lista	
 eng = eng.split()
-print(eng)
