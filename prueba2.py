@@ -1,4 +1,4 @@
-iden = open("/mnt/d/DiscoExtraible/Estudio/Ingles/Vocabulario.txt")
+iden = open("d:\DiscoExtraible\Estudio\Ingles\Vocabulario.txt")
 
 eng = ""
 for i in iden: 

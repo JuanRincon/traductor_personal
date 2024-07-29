@@ -4,18 +4,7 @@ from os import system as sys
 
 sys('clear')
 
-
-def welcome():
-	print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-	print("")
-	print("##### Welcome to English Vocabulary #####")
-	print("")
-	print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
-	print("")
-	print("Your app to practice your personal vocabulary")
-	print("")
-	print("")
-
+"""
 def select_lang():
 	print("  ##  Press:  ##")
 	print("")
@@ -23,6 +12,16 @@ def select_lang():
 	print("|- S - for [S]panish to english vocabulary -|\n")
 	sele = input("")
 	elige_pares(sele)
+"""
+
+def select_lang(o):
+    if o == "Eng":
+        print("English")
+    elif o == "Spa":
+        print("Spanish")
+    else:
+        print("Error")
+    elige_pares(o)
 
 def elige_pares(x):
 	b = randint(0, (len(eng)-1))
@@ -38,7 +37,6 @@ def elige_pares(x):
 	elif ((b%2!=0) and (x == 's' or x == 'S')):
 		a = b - 1
 	else:
-		#select_lang()
 		print("error")
 	play_eng_esp(a,b,x)
 
@@ -61,19 +59,14 @@ def play_eng_esp(a,b,y):
 def opciones(m):
 	if (m == 'z'):
 		select_lang()
-	elif(m == 'x'):
-		despedida()
+	#elif(m == 'x'):
+		#despedida()
 	else:
 		elige_pares(y)
 
-def despedida():
-	print('')
-	print('#############################')
-	print("A sido un placer, qué vuelvas")
-	print('#############################')
 
 def main():
-	welcome()
+#	welcome()
 	select_lang()
 
 if __name__=='__main__':
