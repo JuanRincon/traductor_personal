@@ -37,10 +37,22 @@ def play_eng_esp(c,b,y):
     tecla = ""
     #print("La palabra a traducir es: ")
     d = str(lang[b])
-    print(d, "\n")
-    e = input("Ingrese la traducción: ")
-    if (lang[c] == e):
-        print("Correcto \n")
+    texto = "La palabra a traducir es \n {}".format(d)
+    Label_texto_intro.configure(text=texto)
+    #print(d, "\n")
+    #e = input("Ingrese la traducción: ")
+    
+    palabra = tkinter.StringVar()
+    lan_pal = tkinter.Entry(ventana,font=("Arial",16), textvariable=palabra)
+    lan_pal.pack(padx=20,pady=5)
+    boton_cambio.configure(text="Confirmar")
+    mensaje_label.pack_forget()
+    boton_cambio_espanol.pack_forget()
+    boton_cambio.pack(side=tkinter.BOTTOM)
+
+    if (lang[c] == palabra):
+        #print("Correcto \n")
+        pass
     else:
         print("Incorrecto.\nLa palabra correcta es: ", lang[c], "\n")
     print("Ingrese \"x\" para salir \"z\" para cambiar el lenguaje : ")
@@ -62,7 +74,7 @@ nombre_var = tkinter.StringVar()
 
 Label_texto_intro = tkinter.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your personal vocabulary",font=("Arial",18),padx=20,pady=10)
 Label_texto_intro.pack()
-
+    
 boton_cambio = tkinter.Button(ventana, text="Precione para iniciar",font=("Arial",16),command=cambio_texto)
 boton_cambio.pack(padx=20,pady=5)
 
