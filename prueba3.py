@@ -1,8 +1,5 @@
 from random import randint
 from prueba2 import eng
-from os import system as sys
-
-sys('clear')
 
 def elige_pares(x):
     b = randint(0, (len(eng)-1))
@@ -21,9 +18,3 @@ def elige_pares(x):
         print("error")
     return(a,b,x)
 
-def main():
-#	welcome()
-	select_lang()
-
-if __name__=='__main__':
-	main()		
