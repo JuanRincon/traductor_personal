@@ -14,6 +14,8 @@ def cambio_texto():
     boton_cambio.configure(text="Spanish",command=Spanish_languaje)
 
 def English_languaje():
+    global c
+    global b
     y = "Eng"
     eleccion = elige_pares(y)
     eleccion = list(eleccion)
@@ -56,21 +58,34 @@ def evalua():
         texto = "Incorrecto \n La palabra correcta es: {}".format(lang[c])
         Label_texto_intro.configure(text=texto)
         Label_texto_intro.pack()
+    boton_cambio.configure(text="Otra vez", command=cambio_texto)
 
-ventana = tkinter.Tk()
+def inicio():
+    global ventana
+    global nombre_var
+    global palabra_var
+    global Label_texto_intro
+    global boton_cambio
+    global boton_cambio_espanol
+    global mensaje_label
 
-nombre_var = tkinter.StringVar()
-palabra_var = tkinter.StringVar()
+    ventana = tkinter.Tk()
 
-Label_texto_intro = tkinter.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your personal vocabulary",font=("Arial",18),padx=20,pady=10)
-Label_texto_intro.pack()
-    
-boton_cambio = tkinter.Button(ventana, text="Precione para iniciar",font=("Arial",16),command=cambio_texto)
-boton_cambio.pack(padx=20,pady=5)
+    nombre_var = tkinter.StringVar()
+    palabra_var = tkinter.StringVar()
 
-boton_cambio_espanol= tkinter.Button(ventana, text="",font=("Arial",16))
+    Label_texto_intro = tkinter.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
+    Label_texto_intro.pack()
+        
+    boton_cambio = tkinter.Button(ventana, text="Precione para iniciar",font=("Arial",16),command=cambio_texto)
+    boton_cambio.pack(padx=20,pady=5)
 
-mensaje_label = tkinter.Label(ventana,text="",font=("Arial",18))
-mensaje_label.pack(padx=20,pady=5)
+    boton_cambio_espanol= tkinter.Button(ventana, text="",font=("Arial",16))
 
-ventana.mainloop()
+    mensaje_label = tkinter.Label(ventana,text="",font=("Arial",18))
+    mensaje_label.pack(padx=20,pady=5)
+
+    ventana.mainloop()
+
+if __name__=='__main__':
+    inicio()
