@@ -1,17 +1,14 @@
 import tkinter
-import prueba3 
-from random import randint
 from prueba2 import eng
-from os import system as sys
 from prueba3 import elige_pares
-
-sys('clear')
 
 def cambio_texto():
     Label_texto_intro.configure(text="Seleccione el modo de traducción")
     boton_cambio_espanol.configure(text="English",command=English_languaje)
     boton_cambio_espanol.pack(padx=20,pady=5)
     boton_cambio.configure(text="Spanish",command=Spanish_languaje)
+    lan_pal.delete(0,tkinter.END)
+    lan_pal.pack_forget()
 
 def English_languaje():
     global c
@@ -43,7 +40,6 @@ def play_eng_esp(c,b,y):
     boton_cambio_espanol.pack_forget()
     boton_cambio.configure(text="Confirmar", command=evalua)
     boton_cambio.pack(side=tkinter.BOTTOM)
-    lan_pal = tkinter.Entry(ventana,font=("Arial",16), textvariable=palabra_var)
     lan_pal.pack(padx=20,pady=5)
 
 def evalua():
@@ -60,32 +56,23 @@ def evalua():
         Label_texto_intro.pack()
     boton_cambio.configure(text="Otra vez", command=cambio_texto)
 
-def inicio():
-    global ventana
-    global nombre_var
-    global palabra_var
-    global Label_texto_intro
-    global boton_cambio
-    global boton_cambio_espanol
-    global mensaje_label
+ventana = tkinter.Tk()
 
-    ventana = tkinter.Tk()
+nombre_var = tkinter.StringVar()
+palabra_var = tkinter.StringVar()
 
-    nombre_var = tkinter.StringVar()
-    palabra_var = tkinter.StringVar()
+Label_texto_intro = tkinter.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
+Label_texto_intro.pack()
+    
+boton_cambio = tkinter.Button(ventana, text="Precione para iniciar",font=("Arial",16),command=cambio_texto)
+boton_cambio.pack(padx=20,pady=5)
 
-    Label_texto_intro = tkinter.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
-    Label_texto_intro.pack()
-        
-    boton_cambio = tkinter.Button(ventana, text="Precione para iniciar",font=("Arial",16),command=cambio_texto)
-    boton_cambio.pack(padx=20,pady=5)
+lan_pal = tkinter.Entry(ventana,font=("Arial",16), textvariable=palabra_var)
 
-    boton_cambio_espanol= tkinter.Button(ventana, text="",font=("Arial",16))
+boton_cambio_espanol= tkinter.Button(ventana, text="",font=("Arial",16))
 
-    mensaje_label = tkinter.Label(ventana,text="",font=("Arial",18))
-    mensaje_label.pack(padx=20,pady=5)
+mensaje_label = tkinter.Label(ventana,text="",font=("Arial",18))
+mensaje_label.pack(padx=20,pady=5)
 
-    ventana.mainloop()
+ventana.mainloop()
 
-if __name__=='__main__':
-    inicio()
