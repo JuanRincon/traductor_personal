@@ -1,6 +1,6 @@
 import tkinter
-from prueba2 import eng
-from prueba3 import elige_pares
+from modelo import eng
+from controlador import elige_pares
 
 def cambio_texto():
     Label_texto_intro.configure(text="Seleccione el modo de traducción")
