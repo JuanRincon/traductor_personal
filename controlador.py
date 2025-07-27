@@ -1,8 +1,8 @@
 from random import randint
-from modelo import eng
+from modelo import voc
 
 def elige_pares(x):
-    b = randint(0, (len(eng)-1))
+    b = randint(0, (len(voc)-1))
     a = 0
     if ((b%2==0) and (x == 'Eng')):
         a = b + 1

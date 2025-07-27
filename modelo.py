@@ -1,10 +1,23 @@
-iden = open("Vocabulario.txt")
+import mysql.connector
+from mysql.connector import errors
 
-eng = ""
-for i in iden: 
-	eng += i
+def connect_to_db():
+    try:
+        return mysql.connector.connect(
+            host="localhost",
+            port="33062",
+            user="root",
+            password="Socrates123*",
+            database="voc"
+        )
+    except errors.OperationalError as e:
+        print("Connection error:", e)
+        return None
 
-iden.close()
+voc = connect_to_db()
 
-# convertimos eng cadena a lista	
-eng = eng.split()
+# If connection fails, you can try reconnecting in a loop or handle accordingly
+if voc is None:
+    print("Reconnection failed.")
+else:
+    print("Connection successful.")

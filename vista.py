@@ -1,5 +1,5 @@
 import tkinter
-from modelo import eng
+from modelo import voc
 from controlador import elige_pares
 
 def cambio_texto():
@@ -32,7 +32,7 @@ def Spanish_languaje():
 
 def play_eng_esp(c,b,y):
     #global palabra
-    lang = eng
+    lang = voc
     d = str(lang[b])
     texto = "La palabra a traducir es \n {}".format(d)
     Label_texto_intro.configure(text=texto)
@@ -43,7 +43,7 @@ def play_eng_esp(c,b,y):
     lan_pal.pack(padx=20,pady=5)
 
 def evalua():
-    lang = eng
+    lang = voc
     nombre = nombre_var.get()
     palabra = palabra_var.get()
 
