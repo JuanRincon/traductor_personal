@@ -1,20 +1,19 @@
 from random import randint
-from modelo import voc
+from modelo import db
 
-def elige_pares(x):
-    b = randint(0, (len(voc)-1))
-    a = 0
-    if ((b%2==0) and (x == 'Eng')):
-        a = b + 1
-    elif ((b%2!=0) and (x == 'Eng')):
-        b -= 1
-        a = b + 1
-    elif ((b%2==0) and (x == 'Spa')):
-        b -= 1
-        a = b - 1
-    elif ((b%2!=0) and (x == 'Spa')):
-        a = b - 1
-    else:
-        print("error")
-    return(a,b,x)
+def elige():
+    cursor = db.cursor()
+    cursor.execute("SELECT COUNT(*) FROM words")
+    myresult = cursor.fetchone()
+    cantidad = myresult[0]
+    aleatorio = randint(1, cantidad)
+    cursor.execute(f"SELECT * FROM words WHERE id = {aleatorio}")
+    myresult = cursor.fetchall()
+    insertObject = []
+    columnNames = [column[0] for column in cursor.description]
+    for record in myresult:
+        insertObject.append(dict(zip(columnNames, record)))
+    cursor.close()
+    return insertObject
+
 
