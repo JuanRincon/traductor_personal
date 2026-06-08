@@ -1,5 +1,33 @@
 import tkinter
-from controlador import elige
+from random import randint
+import mysql.connector
+from mysql.connector import errors
+
+table_name = 'words'
+#table_name = 'reinforcement'
+#table_name = 'sentences'
+#table_name = 'phrasal_verbs'
+#table_name = 'idioms'
+
+def connect_to_db():
+    try:
+        return mysql.connector.connect(
+            host="localhost",
+            port="3307",
+            user="root",
+            database="voc"
+        )
+    except errors.OperationalError as e:
+        print("Connection error:", e)
+        return None
+
+db = connect_to_db()
+
+# If connection fails, you can try reconnecting in a loop or handle accordingly
+if db is None:
+    print("Reconnection failed.")
+else:
+    print("Connection successful.")
 
 def cambio_texto():
     Label_texto_intro.configure(text="Seleccione el modo de traducción")
@@ -17,6 +45,21 @@ def English_languaje():
 def Spanish_languaje():
     y = "Spa"
     return play_eng_esp(y)
+
+def elige():
+    cursor = db.cursor()
+    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+    myresult = cursor.fetchone()
+    cantidad = myresult[0]
+    aleatorio = randint(1, cantidad)
+    cursor.execute(f"SELECT * FROM {table_name} WHERE `index` = {aleatorio}")
+    myresult = cursor.fetchall()
+    insertObject = []
+    columnNames = [column[0] for column in cursor.description]
+    for record in myresult:
+        insertObject.append(dict(zip(columnNames, record)))
+    cursor.close()
+    return insertObject
 
 def play_eng_esp(y):
     palabras = elige()
