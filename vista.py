@@ -3,11 +3,7 @@ from random import randint
 import mysql.connector
 from mysql.connector import errors
 
-table_name = 'words'
-#table_name = 'reinforcement'
-#table_name = 'sentences'
-#table_name = 'phrasal_verbs'
-#table_name = 'idioms'
+table_name = "" 
 
 def connect_to_db():
     try:
@@ -29,6 +25,21 @@ if db is None:
 else:
     print("Connection successful.")
 
+def cambio_tema():
+	Label_texto_intro.configure(text="Seleccione el tipo de ejercicio")
+	boton_cambio_words.configure(text="Words", command=words)
+	boton_cambio_words.pack(padx=20,pady=5)
+	boton_cambio_idioms.configure(text="Idioms", command=idioms)
+	boton_cambio_idioms.pack(padx=20,pady=5)
+	boton_cambio_verbs.configure(text="Phrasal verbs", command=verbs)
+	boton_cambio_verbs.pack(padx=20,pady=5)
+	boton_cambio_reinforcement.configure(text="Reinforcement", command=reinforcement)
+	boton_cambio_reinforcement.pack(padx=20,pady=5)
+	boton_cambio_sentences.configure(text="Sentences", command=sentences)
+	boton_cambio_sentences.pack(padx=20,pady=5)
+	lan_pal.delete(0,tkinter.END)
+	lan_pal.pack_forget()
+	
 def cambio_texto():
     Label_texto_intro.configure(text="Seleccione el modo de traducción")
     boton_cambio_espanol.configure(text="Spanish",command=Spanish_languaje)
@@ -37,6 +48,31 @@ def cambio_texto():
     boton_cambio_ingles.pack(padx=20,pady=5)
     lan_pal.delete(0,tkinter.END)
     lan_pal.pack_forget()
+
+def words():
+	global table_name
+	table_name="words"
+	cambio_texto()
+
+def idioms():
+	global table_name
+	table_name="idioms"
+	cambio_texto()
+
+def verbs():
+	global table_name
+	table_name="verbs"
+	cambio_texto()
+
+def reinforcement():
+	global table_name
+	table_name="reinforcement"
+	cambio_texto()
+
+def sentences():
+	global table_name
+	table_name="sentences"
+	cambio_texto()
 
 def English_languaje():
     y = "Eng"
@@ -103,18 +139,26 @@ ventana = tkinter.Tk()
 nombre_var = tkinter.StringVar()
 palabra_var = tkinter.StringVar()
 
-Label_texto_intro = tkinter.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
+frame1 = tkinter.Frame(ventana)
+
+Label_texto_intro = tkinter.Label(frame1, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
 Label_texto_intro.pack()
-    
-boton_cambio_espanol = tkinter.Button(ventana, text="Press to start",font=("Arial",16),command=cambio_texto)
+ 
+boton_cambio_espanol = tkinter.Button(frame1, text="Press to start",font=("Arial",16),command=cambio_tema)
 boton_cambio_espanol.pack(padx=20,pady=5)
 
-lan_pal = tkinter.Entry(ventana,font=("Arial",16), textvariable=palabra_var)
+lan_pal = tkinter.Entry(frame1,font=("Arial",16), textvariable=palabra_var)
 
-boton_cambio_ingles= tkinter.Button(ventana, text="",font=("Arial",16))
+boton_cambio_ingles= tkinter.Button(frame1, text="",font=("Arial",16))
+boton_cambio_idioms= tkinter.Button(frame1, text="",font=("Arial", 16))
+boton_cambio_words= tkinter.Button(frame1, text="",font=("Arial", 16))
+boton_cambio_verbs= tkinter.Button(frame1, text="",font=("Arial", 16))
+boton_cambio_reinforcement= tkinter.Button(frame1, text="",font=("Arial", 16))
+boton_cambio_sentences= tkinter.Button(frame1, text="",font=("Arial", 16))
 
-mensaje_label = tkinter.Label(ventana,text="",font=("Arial",18))
+mensaje_label = tkinter.Label(frame1,text="",font=("Arial",18))
 mensaje_label.pack(padx=20,pady=5)
+frame1.pack()
 
 ventana.mainloop()
 
