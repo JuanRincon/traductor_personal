@@ -26,28 +26,56 @@ else:
     print("Connection successful.")
 
 def cambio_tema():
-	Label_texto_intro.configure(text="Seleccione el tipo de ejercicio")
-	boton_cambio_words.configure(text="Words", command=words)
-	boton_cambio_words.pack(padx=20,pady=5)
-	boton_cambio_idioms.configure(text="Idioms", command=idioms)
-	boton_cambio_idioms.pack(padx=20,pady=5)
-	boton_cambio_verbs.configure(text="Phrasal verbs", command=verbs)
-	boton_cambio_verbs.pack(padx=20,pady=5)
-	boton_cambio_reinforcement.configure(text="Reinforcement", command=reinforcement)
-	boton_cambio_reinforcement.pack(padx=20,pady=5)
-	boton_cambio_sentences.configure(text="Sentences", command=sentences)
-	boton_cambio_sentences.pack(padx=20,pady=5)
-	lan_pal.delete(0,tkinter.END)
-	lan_pal.pack_forget()
-	
-def cambio_texto():
-    Label_texto_intro.configure(text="Seleccione el modo de traducción")
-    boton_cambio_espanol.configure(text="Spanish",command=Spanish_languaje)
-    boton_cambio_espanol.pack(padx=20,pady=5)
-    boton_cambio_ingles.configure(text="English",command=English_languaje)
-    boton_cambio_ingles.pack(padx=20,pady=5)
+    frame1.pack_forget()
+    Label_texto_ejercicio= tkinter.Label(frame2, text="Seleccione el tipo de ejercicio").pack()
+    boton_cambio_idioms= tkinter.Button(frame2, text="",font=("Arial", 16))
+    boton_cambio_words= tkinter.Button(frame2, text="",font=("Arial", 16))
+    boton_cambio_verbs= tkinter.Button(frame2, text="",font=("Arial", 16))
+    boton_cambio_reinforcement= tkinter.Button(frame2, text="",font=("Arial", 16))
+    boton_cambio_sentences= tkinter.Button(frame2, text="",font=("Arial", 16))
+    frame2.pack()
+
+    boton_cambio_words.configure(text="Words", command=words)
+    boton_cambio_words.pack(padx=20,pady=5)
+    boton_cambio_idioms.configure(text="Idioms", command=idioms)
+    boton_cambio_idioms.pack(padx=20,pady=5)
+    boton_cambio_verbs.configure(text="Phrasal verbs", command=verbs)
+    boton_cambio_verbs.pack(padx=20,pady=5)
+    boton_cambio_reinforcement.configure(text="Reinforcement", command=reinforcement)
+    boton_cambio_reinforcement.pack(padx=20,pady=5)
+    boton_cambio_sentences.configure(text="Sentences", command=sentences)
+    boton_cambio_sentences.pack(padx=20,pady=5)
     lan_pal.delete(0,tkinter.END)
     lan_pal.pack_forget()
+	
+def ocultar_boton():
+    # Oculta el botón usando el mismo gestor con el que fue creado (pack, grid o place)
+    boton_again.pack_forget()
+    # Pare refrescar la ventana después de ocultar el botón
+    ventana.update()
+
+def eliminar_widget():
+    for widget in frame3.winfo_children():
+        widget.destroy()
+
+def cambio_texto():
+    ocultar_boton()
+    for widget in frame3.winfo_children():
+        widget.destroy()
+    frame5.pack_forget()
+    frame2.pack_forget()
+    frame3.pack_forget()
+    Label_texto_traduccion = tkinter.Label(frame3, text="Seleccione el modo de traducción").pack()
+    boton_cambio_espanol = tkinter.Button(frame3, text="",font=("Arial", 16))
+    boton_cambio_espanol.configure(text="Spanish",command=Spanish_languaje)
+    boton_cambio_espanol.pack(padx=20,pady=5)
+    boton_cambio_ingles = tkinter.Button(frame3, text="",font=("Arial", 16))
+    boton_cambio_ingles.configure( text="English",command=English_languaje)
+    boton_cambio_ingles.pack(padx=20,pady=5)
+    frame3.pack()
+    lan_pal.delete(0,tkinter.END)
+    lan_pal.pack_forget()
+    
 
 def words():
 	global table_name
@@ -61,7 +89,7 @@ def idioms():
 
 def verbs():
 	global table_name
-	table_name="verbs"
+	table_name="phrasal_verbs"
 	cambio_texto()
 
 def reinforcement():
@@ -98,10 +126,14 @@ def elige():
     return insertObject
 
 def play_eng_esp(y):
+    frame3.pack_forget()
+    for widget in frame4.winfo_children():
+        widget.destroy()
     palabras = elige()
     palabras = palabras[0]
     palabras = dict(palabras)
     global c
+    global e
     if y == "Spa":
         d = palabras['Esp']
         c = palabras['Eng']
@@ -109,28 +141,34 @@ def play_eng_esp(y):
     elif y == "Eng":
         d = palabras['Eng']
         c = palabras['Esp']
-        texto = "La palabra a traducir es \n {}".format(d)
-    Label_texto_intro.configure(text=texto)
-    mensaje_label.pack_forget()
-    boton_cambio_ingles.pack_forget()
-    boton_cambio_espanol.configure(text="Confirmar", command=evalua)
-    boton_cambio_espanol.pack(side=tkinter.BOTTOM)
+        texto = "The word to translate is \n {}".format(d)
+    Label_texto_play = tkinter.Label(frame4, text=texto).pack()
+    e = tkinter.Entry(frame4, width=40)
+    e.pack()
+    boton_confirmar = tkinter.Button(frame4, text="",font=("Arial",16))
+    boton_confirmar.configure(text="Confirmar", command=evalua)
+    boton_confirmar.pack(side=tkinter.BOTTOM)
+    frame4.pack()
     lan_pal.pack(padx=20,pady=5)
 
 def evalua():
-    global c
-
-    nombre = nombre_var.get()
-    palabra = palabra_var.get()
+    frame4.pack_forget()
+    for widget in frame5.winfo_children():
+        widget.destroy()
+    global boton_again
+    palabra = e.get()
+    Label_evalua = tkinter.Label(frame5, text="")
 
     if (c == palabra):
-        Label_texto_intro.configure(text="Correcto")
-        Label_texto_intro.pack()
+        Label_evalua.configure(text="Correcto")
+        Label_evalua.pack()
     else:
         texto = "Incorrecto \n La palabra correcta es: {}".format(c)
-        Label_texto_intro.configure(text=texto)
-        Label_texto_intro.pack()
-    boton_cambio_espanol.configure(text="Otra vez", command=cambio_texto)
+        Label_evalua.configure(text=texto)
+        Label_evalua.pack()
+    frame5.pack()
+    boton_again.configure(text="Otra vez", command=cambio_texto)
+    boton_again.pack()
 
 c = ""
 
@@ -144,17 +182,14 @@ frame1 = tkinter.Frame(ventana)
 Label_texto_intro = tkinter.Label(frame1, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
 Label_texto_intro.pack()
  
-boton_cambio_espanol = tkinter.Button(frame1, text="Press to start",font=("Arial",16),command=cambio_tema)
-boton_cambio_espanol.pack(padx=20,pady=5)
-
+boton_start = tkinter.Button(frame1, text="Press to start",font=("Arial",16),command=cambio_tema)
+boton_start.pack(padx=20,pady=5)
+boton_again = tkinter.Button()
+frame2 = tkinter.Frame(ventana)
+frame3 = tkinter.Frame(ventana)
+frame4 = tkinter.Frame(ventana)
+frame5 = tkinter.Frame(ventana)
 lan_pal = tkinter.Entry(frame1,font=("Arial",16), textvariable=palabra_var)
-
-boton_cambio_ingles= tkinter.Button(frame1, text="",font=("Arial",16))
-boton_cambio_idioms= tkinter.Button(frame1, text="",font=("Arial", 16))
-boton_cambio_words= tkinter.Button(frame1, text="",font=("Arial", 16))
-boton_cambio_verbs= tkinter.Button(frame1, text="",font=("Arial", 16))
-boton_cambio_reinforcement= tkinter.Button(frame1, text="",font=("Arial", 16))
-boton_cambio_sentences= tkinter.Button(frame1, text="",font=("Arial", 16))
 
 mensaje_label = tkinter.Label(frame1,text="",font=("Arial",18))
 mensaje_label.pack(padx=20,pady=5)
