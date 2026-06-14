@@ -1,4 +1,4 @@
-import tkinter
+import tkinter as tk
 from random import randint
 import mysql.connector
 from mysql.connector import errors
@@ -26,14 +26,13 @@ else:
     print("Connection successful.")
 
 def cambio_tema():
-    frame1.pack_forget()
-    Label_texto_ejercicio= tkinter.Label(frame2, text="Seleccione el tipo de ejercicio").pack()
-    boton_cambio_idioms= tkinter.Button(frame2, text="",font=("Arial", 16))
-    boton_cambio_words= tkinter.Button(frame2, text="",font=("Arial", 16))
-    boton_cambio_verbs= tkinter.Button(frame2, text="",font=("Arial", 16))
-    boton_cambio_reinforcement= tkinter.Button(frame2, text="",font=("Arial", 16))
-    boton_cambio_sentences= tkinter.Button(frame2, text="",font=("Arial", 16))
-    frame2.pack()
+    limpiar_ventana()
+    Label_texto_ejercicio= tk.Label(ventana, text="Seleccione el tipo de ejercicio").pack()
+    boton_cambio_idioms= tk.Button(ventana, text="",font=("Arial", 16))
+    boton_cambio_words= tk.Button(ventana, text="",font=("Arial", 16))
+    boton_cambio_verbs= tk.Button(ventana, text="",font=("Arial", 16))
+    boton_cambio_reinforcement= tk.Button(ventana, text="",font=("Arial", 16))
+    boton_cambio_sentences= tk.Button(ventana, text="",font=("Arial", 16))
 
     boton_cambio_words.configure(text="Words", command=words)
     boton_cambio_words.pack(padx=20,pady=5)
@@ -45,8 +44,6 @@ def cambio_tema():
     boton_cambio_reinforcement.pack(padx=20,pady=5)
     boton_cambio_sentences.configure(text="Sentences", command=sentences)
     boton_cambio_sentences.pack(padx=20,pady=5)
-    lan_pal.delete(0,tkinter.END)
-    lan_pal.pack_forget()
 	
 def ocultar_boton():
     # Oculta el botón usando el mismo gestor con el que fue creado (pack, grid o place)
@@ -54,28 +51,19 @@ def ocultar_boton():
     # Pare refrescar la ventana después de ocultar el botón
     ventana.update()
 
-def eliminar_widget():
-    for widget in frame3.winfo_children():
+def limpiar_ventana():
+    for widget in ventana.winfo_children():
         widget.destroy()
 
 def cambio_texto():
-    ocultar_boton()
-    for widget in frame3.winfo_children():
-        widget.destroy()
-    frame5.pack_forget()
-    frame2.pack_forget()
-    frame3.pack_forget()
-    Label_texto_traduccion = tkinter.Label(frame3, text="Seleccione el modo de traducción").pack()
-    boton_cambio_espanol = tkinter.Button(frame3, text="",font=("Arial", 16))
+    limpiar_ventana()
+    Label_texto_traduccion = tk.Label(ventana, text="Seleccione el modo de traducción").pack()
+    boton_cambio_espanol = tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_espanol.configure(text="Spanish",command=Spanish_languaje)
     boton_cambio_espanol.pack(padx=20,pady=5)
-    boton_cambio_ingles = tkinter.Button(frame3, text="",font=("Arial", 16))
+    boton_cambio_ingles = tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_ingles.configure( text="English",command=English_languaje)
     boton_cambio_ingles.pack(padx=20,pady=5)
-    frame3.pack()
-    lan_pal.delete(0,tkinter.END)
-    lan_pal.pack_forget()
-    
 
 def words():
 	global table_name
@@ -126,9 +114,7 @@ def elige():
     return insertObject
 
 def play_eng_esp(y):
-    frame3.pack_forget()
-    for widget in frame4.winfo_children():
-        widget.destroy()
+    limpiar_ventana()
     palabras = elige()
     palabras = palabras[0]
     palabras = dict(palabras)
@@ -142,22 +128,19 @@ def play_eng_esp(y):
         d = palabras['Eng']
         c = palabras['Esp']
         texto = "The word to translate is \n {}".format(d)
-    Label_texto_play = tkinter.Label(frame4, text=texto).pack()
-    e = tkinter.Entry(frame4, width=40)
+    Label_texto_play = tk.Label(ventana, text=texto).pack()
+    e = tk.Entry(ventana, width=40)
     e.pack()
-    boton_confirmar = tkinter.Button(frame4, text="",font=("Arial",16))
-    boton_confirmar.configure(text="Confirmar", command=evalua)
-    boton_confirmar.pack(side=tkinter.BOTTOM)
-    frame4.pack()
-    lan_pal.pack(padx=20,pady=5)
+    boton_confirmar = tk.Button(ventana, text="Confirmar",font=("Arial",16), command=valor_entrada)
+    boton_confirmar.pack(side=tk.BOTTOM)
 
-def evalua():
-    frame4.pack_forget()
-    for widget in frame5.winfo_children():
-        widget.destroy()
-    global boton_again
-    palabra = e.get()
-    Label_evalua = tkinter.Label(frame5, text="")
+def valor_entrada():
+    palabra = e.get
+    limpiar_ventana()
+    return evalua(palabra)
+
+def evalua(palabra):
+    Label_evalua = tk.Label(ventana, text="")
 
     if (c == palabra):
         Label_evalua.configure(text="Correcto")
@@ -166,34 +149,21 @@ def evalua():
         texto = "Incorrecto \n La palabra correcta es: {}".format(c)
         Label_evalua.configure(text=texto)
         Label_evalua.pack()
-    frame5.pack()
-    boton_again.configure(text="Otra vez", command=cambio_texto)
+    boton_again = tk.Button(ventana, text="Otra vez", command=cambio_texto)
     boton_again.pack()
 
 c = ""
 
-ventana = tkinter.Tk()
+ventana = tk.Tk()
 
-nombre_var = tkinter.StringVar()
-palabra_var = tkinter.StringVar()
-
-frame1 = tkinter.Frame(ventana)
-
-Label_texto_intro = tkinter.Label(frame1, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
+Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
 Label_texto_intro.pack()
  
-boton_start = tkinter.Button(frame1, text="Press to start",font=("Arial",16),command=cambio_tema)
+boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=cambio_tema)
 boton_start.pack(padx=20,pady=5)
-boton_again = tkinter.Button()
-frame2 = tkinter.Frame(ventana)
-frame3 = tkinter.Frame(ventana)
-frame4 = tkinter.Frame(ventana)
-frame5 = tkinter.Frame(ventana)
-lan_pal = tkinter.Entry(frame1,font=("Arial",16), textvariable=palabra_var)
 
-mensaje_label = tkinter.Label(frame1,text="",font=("Arial",18))
+mensaje_label = tk.Label(ventana,text="",font=("Arial",18))
 mensaje_label.pack(padx=20,pady=5)
-frame1.pack()
 
 ventana.mainloop()
 
