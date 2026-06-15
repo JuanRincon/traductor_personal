@@ -1,7 +1,8 @@
 import tkinter as tk
+from tkinter import messagebox
 from random import randint
 import mysql.connector
-from mysql.connector import errors
+from mysql.connector import errors, Error
 
 table_name = "" 
 
@@ -24,6 +25,56 @@ if db is None:
     print("Reconnection failed.")
 else:
     print("Connection successful.")
+
+def define_datos():
+    global bandera
+    bandera = "datos"
+    cambio_tema()
+
+def define_juego():
+    global bandera
+    #bandera = "juego"
+    cambio_tema()
+
+def datos_entrenamiento():
+    def limpiar_campos():
+        entry_eng.delete(0, tk.END)
+        entry_esp.delete(0, tk.END)
+
+    def insertar():
+        conexion = connect_to_db()
+        cursor = conexion.cursor()
+        sql = f"INSERT INTO {table_name} (Eng, Esp) VALUES (%s, %s)"
+        valores = entry_eng.get(), entry_esp.get()
+        try:
+            cursor.execute(sql, valores)
+            conexion.commit()
+            messagebox.showinfo('Información', 'Registro insertado con éxito')
+            limpiar_campos()
+        except Error as e:
+            messagebox.showerror('Error', str(e))
+        finally:
+            conexion.close()
+    """
+       except Error as e:
+            messagebox.showerror('Error', str(e))
+        finally:
+            conexion.close()   
+    tk.Label(ventana,text="index").grid(column=0,row=0)
+    entry_index= tk.Entry(ventana)
+    entry_index.grid(column=0,row=1)
+    """
+    limpiar_ventana()
+    tk.Label(ventana,text="Eng").grid(column=1,row=0)
+    entry_eng= tk.Entry(ventana)
+    entry_eng.grid(column=1,row=1)
+
+    tk.Label(ventana,text="Esp").grid(column=2,row=0)
+    entry_esp= tk.Entry(ventana)
+    entry_esp.grid(column=2,row=1)
+
+    tk.Button(ventana,text="Insertar", command=insertar).grid(column=0, row=2)
+
 
 def cambio_tema():
     limpiar_ventana()
@@ -66,29 +117,44 @@ def cambio_texto():
     boton_cambio_ingles.pack(padx=20,pady=5)
 
 def words():
-	global table_name
-	table_name="words"
-	cambio_texto()
+    global table_name
+    table_name="words"
+    if bandera == "datos":
+        datos_entrenamiento()
+    else:
+        cambio_texto()
 
 def idioms():
-	global table_name
-	table_name="idioms"
-	cambio_texto()
+    global table_name
+    table_name="idioms"
+    if bandera == "datos":
+        datos_entrenamiento()
+    else:
+        cambio_texto()
 
 def verbs():
-	global table_name
-	table_name="phrasal_verbs"
-	cambio_texto()
+    global table_name
+    table_name="phrasal_verbs"
+    if bandera == "datos":
+        datos_entrenamiento()
+    else:
+        cambio_texto()
 
 def reinforcement():
-	global table_name
-	table_name="reinforcement"
-	cambio_texto()
+    global table_name
+    table_name="reinforcement"
+    if bandera == "datos":
+        datos_entrenamiento()
+    else:
+        cambio_texto()
 
 def sentences():
-	global table_name
-	table_name="sentences"
-	cambio_texto()
+    global table_name
+    table_name="sentences"
+    if bandera == "datos":
+        datos_entrenamiento()
+    else:
+        cambio_texto()
 
 def English_languaje():
     y = "Eng"
@@ -155,15 +221,18 @@ def evalua(palabra):
 c = ""
 
 ventana = tk.Tk()
-
+ventana.title("Your app to study languages")
+bandera = ""
 Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
 Label_texto_intro.pack()
  
-boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=cambio_tema)
+boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=define_juego)
 boton_start.pack(padx=20,pady=5)
+boton_datos = tk.Button(ventana, text="Ingresa nuevos datos",font=("Arial",16),command=define_datos)
+boton_start.pack(padx=20,pady=5)
+boton_datos.pack(padx=20,pady=5)
 
 mensaje_label = tk.Label(ventana,text="",font=("Arial",18))
 mensaje_label.pack(padx=20,pady=5)
 
 ventana.mainloop()
-
