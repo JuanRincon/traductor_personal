@@ -38,6 +38,7 @@ def define_juego():
 
 def datos_entrenamiento():
     def limpiar_campos():
+        entry_index.delete(0, tk.END)
         entry_eng.delete(0, tk.END)
         entry_esp.delete(0, tk.END)
 
@@ -55,16 +56,57 @@ def datos_entrenamiento():
             messagebox.showerror('Error', str(e))
         finally:
             conexion.close()
-    """
-       except Error as e:
+    def editar():
+        conexion = connect_to_db()
+        cursor = conexion.cursor()
+        sql = f"UPDATE {table_name} SET Eng=%s WHERE Esp=%s"
+        valores = (entry_eng.get(), entry_esp.get())
+        try:
+            cursor.execute(sql, valores)
+            conexion.commit()
+            messagebox.showinfo('Información', 'Registro actualizado con éxito')
+            limpiar_campos()
+        except Error as e:
             messagebox.showerror('Error', str(e))
         finally:
-            conexion.close()   
-    tk.Label(ventana,text="index").grid(column=0,row=0)
+            conexion.close()
+
+    def eliminar():
+        conexion =  connect_to_db()
+        cursor = conexion.cursor()
+        sql =f"DELETE FROM {table_name} WHERE `index`=%s"
+        try:
+            cursor.execute(sql,(entry_index.get(),))
+            conexion.commit()
+            messagebox.showinfo('Información', 'Registro eliminado con éxito')
+            limpiar_campos()
+        except Error as e:
+            messagebox.showerror('Error', str(e))
+        finally:
+            conexion.close()
+
+    def buscar():
+        conexion =   connect_to_db()
+        cursor = conexion.cursor()
+
+        sql = f"SELECT * FROM {table_name} WHERE `index`=%s"
+        try:
+            cursor.execute(sql,(entry_index.get(),))
+            registro = cursor.fetchone()
+            if registro:
+                entry_eng.insert(0, registro[1])
+                entry_esp.insert(0, registro[2])
+            else:
+                messagebox.showinfo('Información', 'No se encontró el registro solicitado')
+        except Error as e:
+            messagebox.showerror('Error', str(e))
+        finally:
+            conexion.close()
+    limpiar_ventana()
+    tk.Label(ventana,text="Index").grid(column=0,row=0)
     entry_index= tk.Entry(ventana)
     entry_index.grid(column=0,row=1)
-    """
-    limpiar_ventana()
+
     tk.Label(ventana,text="Eng").grid(column=1,row=0)
     entry_eng= tk.Entry(ventana)
     entry_eng.grid(column=1,row=1)
@@ -74,7 +116,9 @@ def datos_entrenamiento():
     entry_esp.grid(column=2,row=1)
 
     tk.Button(ventana,text="Insertar", command=insertar).grid(column=0, row=2)
-
+    tk.Button(ventana,text="Buscar", command=buscar).grid(column=1, row=2)
+    tk.Button(ventana,text="Editar", command=editar).grid(column=2, row=2)
+    tk.Button(ventana,text="Eliminar", command=eliminar).grid(column=3, row=2)
 
 def cambio_tema():
     limpiar_ventana()
