@@ -1,30 +1,27 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 from random import randint
 import mysql.connector
 from mysql.connector import errors, Error
+
+ventana = tk.Tk()
 
 table_name = "" 
 
 def connect_to_db():
     try:
-        return mysql.connector.connect(
-            host="localhost",
+        conn = mysql.connector.connect(
+            host="127.0.0.1",
             port="3307",
             user="root",
-            database="voc"
+            database="voc",
         )
-    except errors.OperationalError as e:
-        print("Connection error:", e)
+        return conn
+
+    except Exception as e:
+        print("ERROR MYSQL:", repr(e))
+        input("Presiona Enter para cerrar...")
         return None
-
-db = connect_to_db()
-
-# If connection fails, you can try reconnecting in a loop or handle accordingly
-if db is None:
-    print("Reconnection failed.")
-else:
-    print("Connection successful.")
 
 def define_datos():
     global bandera
@@ -33,7 +30,7 @@ def define_datos():
 
 def define_juego():
     global bandera
-    #bandera = "juego"
+    bandera = "juego"
     cambio_tema()
 
 def datos_entrenamiento():
@@ -56,11 +53,12 @@ def datos_entrenamiento():
             messagebox.showerror('Error', str(e))
         finally:
             conexion.close()
+
     def editar():
         conexion = connect_to_db()
         cursor = conexion.cursor()
-        sql = f"UPDATE {table_name} SET Eng=%s WHERE Esp=%s"
-        valores = (entry_eng.get(), entry_esp.get())
+        sql = f"UPDATE {table_name} SET Eng=%s,Esp=%s WHERE `index`=%s"
+        valores = (entry_eng.get(), entry_esp.get(), entry_index.get())
         try:
             cursor.execute(sql, valores)
             conexion.commit()
@@ -89,17 +87,62 @@ def datos_entrenamiento():
         conexion =   connect_to_db()
         cursor = conexion.cursor()
 
-        sql = f"SELECT * FROM {table_name} WHERE `index`=%s"
+        if entry_index.get():
+            sql = f"SELECT * FROM {table_name} WHERE `index`=%s"
+            variable = (entry_index.get(),)
+        elif entry_eng.get():
+            sql = f"SELECT * FROM {table_name} WHERE Eng=%s"
+            variable = (entry_eng.get(),)
+        elif entry_esp.get():
+            sql = f"SELECT * FROM {table_name} WHERE Esp=%s"
+            variable = (entry_esp.get(),)
         try:
-            cursor.execute(sql,(entry_index.get(),))
+            cursor.execute(sql,variable)
             registro = cursor.fetchone()
-            if registro:
+            if registro and entry_index.get():
                 entry_eng.insert(0, registro[1])
                 entry_esp.insert(0, registro[2])
+            elif registro and entry_eng.get():
+                entry_index.insert(0, registro[0])
+                entry_esp.insert(0, registro[2])
+            elif registro and entry_esp.get():
+                entry_index.insert(0, registro[0])
+                entry_eng.insert(0, registro[1])
             else:
                 messagebox.showinfo('Información', 'No se encontró el registro solicitado')
         except Error as e:
             messagebox.showerror('Error', str(e))
+        finally:
+            conexion.close()
+    
+    def mostrar_todo():
+        limpiar_ventana()
+        conexion = connect_to_db()
+        if not conexion:
+            return
+        tabla = ttk.Treeview(ventana, show="headings")
+        tabla.pack(fill="both", expand=True)
+        boton_inicio = tk.Button(ventana, text="Inicio", command=inicio)
+        boton_inicio.pack()
+        try:
+            cursor = conexion.cursor()
+            cursor.execute(f"SELECT * FROM {table_name}")
+
+            columnas = [col[0] for col in cursor.description]
+
+            tabla.delete(*tabla.get_children())
+            tabla["columns"] = columnas
+
+            for col in columnas:
+                tabla.heading(col, text=col)
+                tabla.column(col, width=120)
+
+            for fila in cursor.fetchall():
+                tabla.insert("", tk.END, values=fila)
+
+        except mysql.connector.Error as e:
+            messagebox.showerror("Error", str(e))
+
         finally:
             conexion.close()
     limpiar_ventana()
@@ -119,6 +162,7 @@ def datos_entrenamiento():
     tk.Button(ventana,text="Buscar", command=buscar).grid(column=1, row=2)
     tk.Button(ventana,text="Editar", command=editar).grid(column=2, row=2)
     tk.Button(ventana,text="Eliminar", command=eliminar).grid(column=3, row=2)
+    tk.Button(ventana,text="Mostrar todo", command=mostrar_todo).grid(column=3, row=2)
 
 def cambio_tema():
     limpiar_ventana()
@@ -154,10 +198,10 @@ def cambio_texto():
     limpiar_ventana()
     Label_texto_traduccion = tk.Label(ventana, text="Seleccione el modo de traducción").pack()
     boton_cambio_espanol = tk.Button(ventana, text="",font=("Arial", 16))
-    boton_cambio_espanol.configure(text="Spanish",command=Spanish_languaje)
+    boton_cambio_espanol.configure(text="Spanish",command=lambda:play_eng_esp("Spa"))
     boton_cambio_espanol.pack(padx=20,pady=5)
     boton_cambio_ingles = tk.Button(ventana, text="",font=("Arial", 16))
-    boton_cambio_ingles.configure( text="English",command=English_languaje)
+    boton_cambio_ingles.configure( text="English",command=lambda:play_eng_esp("Eng"))
     boton_cambio_ingles.pack(padx=20,pady=5)
 
 def words():
@@ -200,33 +244,32 @@ def sentences():
     else:
         cambio_texto()
 
-def English_languaje():
-    y = "Eng"
-    return play_eng_esp(y)
-
-def Spanish_languaje():
-    y = "Spa"
-    return play_eng_esp(y)
-
 def elige():
-    cursor = db.cursor()
-    cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-    myresult = cursor.fetchone()
-    cantidad = myresult[0]
-    aleatorio = randint(1, cantidad)
-    cursor.execute(f"SELECT * FROM {table_name} WHERE `index` = {aleatorio}")
-    myresult = cursor.fetchall()
-    insertObject = []
-    columnNames = [column[0] for column in cursor.description]
-    for record in myresult:
-        insertObject.append(dict(zip(columnNames, record)))
-    cursor.close()
-    return insertObject
+    try:
+        db = connect_to_db()
+        cursor = db.cursor()
+        cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
+        cantidad = cursor.fetchone()[0]
+        aleatorio = randint(1, cantidad)
+        cursor.execute(
+            f"SELECT * FROM {table_name} WHERE `index` = {aleatorio}"
+        )
+        myresult = cursor.fetchone()
+        if myresult is None:
+            return []
+        cursor.close()
+        db.close()
+        return myresult
+    except Exception as ex:
+        raise
 
 def play_eng_esp(y):
     limpiar_ventana()
     palabras = elige()
-    palabras = palabras[0]
+    palabras =  {
+            "Eng": palabras[1],
+            "Esp": palabras[2]
+    }
     palabras = dict(palabras)
     global c
     global e
@@ -245,13 +288,12 @@ def play_eng_esp(y):
     boton_confirmar.pack(side=tk.BOTTOM)
 
 def valor_entrada():
-    palabra = e.get
+    palabra = e.get()
     limpiar_ventana()
     return evalua(palabra)
 
 def evalua(palabra):
     Label_evalua = tk.Label(ventana, text="")
-
     if (c == palabra):
         Label_evalua.configure(text="Correcto")
         Label_evalua.pack()
@@ -262,21 +304,25 @@ def evalua(palabra):
     boton_again = tk.Button(ventana, text="Otra vez", command=cambio_texto)
     boton_again.pack()
 
-c = ""
+def inicio():
+    limpiar_ventana()
+    c = ""
 
-ventana = tk.Tk()
-ventana.title("Your app to study languages")
-bandera = ""
-Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
-Label_texto_intro.pack()
- 
-boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=define_juego)
-boton_start.pack(padx=20,pady=5)
-boton_datos = tk.Button(ventana, text="Ingresa nuevos datos",font=("Arial",16),command=define_datos)
-boton_start.pack(padx=20,pady=5)
-boton_datos.pack(padx=20,pady=5)
+    Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
+    Label_texto_intro.pack()
+     
+    boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=define_juego)
+    boton_start.pack(padx=20,pady=5)
+    boton_datos = tk.Button(ventana, text="Ingresa nuevos datos",font=("Arial",16),command=define_datos)
+    boton_start.pack(padx=20,pady=5)
+    boton_datos.pack(padx=20,pady=5)
 
-mensaje_label = tk.Label(ventana,text="",font=("Arial",18))
-mensaje_label.pack(padx=20,pady=5)
+    mensaje_label = tk.Label(ventana,text="",font=("Arial",18))
+    mensaje_label.pack(padx=20,pady=5)
+
+#ventana.title("Your app to study languages")
+
+if __name__=='__main__':
+    inicio()
 
 ventana.mainloop()
