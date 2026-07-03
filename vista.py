@@ -42,7 +42,7 @@ def datos_entrenamiento():
     def insertar():
         conexion = connect_to_db()
         cursor = conexion.cursor()
-        sql = f"INSERT INTO {table_name} (Eng, Esp) VALUES (%s, %s)"
+        sql = f"INSERT IGNORE INTO {table_name} (Eng, Esp) VALUES (%s, %s)"
         valores = entry_eng.get(), entry_esp.get()
         try:
             cursor.execute(sql, valores)
@@ -162,11 +162,12 @@ def datos_entrenamiento():
     tk.Button(ventana,text="Buscar", command=buscar).grid(column=1, row=2)
     tk.Button(ventana,text="Editar", command=editar).grid(column=2, row=2)
     tk.Button(ventana,text="Eliminar", command=eliminar).grid(column=3, row=2)
-    tk.Button(ventana,text="Mostrar todo", command=mostrar_todo).grid(column=3, row=2)
+    tk.Button(ventana,text="Limpiar", command=limpiar_campos).grid(column=3, row=1)
+    tk.Button(ventana,text="Mostrar todo", command=mostrar_todo).grid(column=3, row=0)
 
 def cambio_tema():
     limpiar_ventana()
-    Label_texto_ejercicio= tk.Label(ventana, text="Seleccione el tipo de ejercicio").pack()
+    Label_texto_ejercicio= tk.Label(ventana, text="Seleccione el tipo de ejercicio\n ",font=("Arial",16)).pack()
     boton_cambio_idioms= tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_words= tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_verbs= tk.Button(ventana, text="",font=("Arial", 16))
@@ -196,7 +197,7 @@ def limpiar_ventana():
 
 def cambio_texto():
     limpiar_ventana()
-    Label_texto_traduccion = tk.Label(ventana, text="Seleccione el modo de traducción").pack()
+    Label_texto_traduccion = tk.Label(ventana, text="Seleccione el modo de traducción\n ",font=("Arial",16)).pack()
     boton_cambio_espanol = tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_espanol.configure(text="Spanish",command=lambda:play_eng_esp("Spa"))
     boton_cambio_espanol.pack(padx=20,pady=5)
@@ -276,13 +277,13 @@ def play_eng_esp(y):
     if y == "Spa":
         d = palabras['Esp']
         c = palabras['Eng']
-        texto = "La palabra a traducir es \n {}".format(d)
+        texto = "La palabra a traducir es: \n\n {}\n ".format(d)
     elif y == "Eng":
         d = palabras['Eng']
         c = palabras['Esp']
-        texto = "The word to translate is \n {}".format(d)
-    Label_texto_play = tk.Label(ventana, text=texto).pack()
-    e = tk.Entry(ventana, width=40)
+        texto = "The word to translate is: \n\n {}\n ".format(d)
+    Label_texto_play = tk.Label(ventana, text=texto,font=("Arial",16)).pack()
+    e = tk.Entry(ventana, text="\n", width=40)
     e.pack()
     boton_confirmar = tk.Button(ventana, text="Confirmar",font=("Arial",16), command=valor_entrada)
     boton_confirmar.pack(side=tk.BOTTOM)
@@ -295,20 +296,20 @@ def valor_entrada():
 def evalua(palabra):
     Label_evalua = tk.Label(ventana, text="")
     if (c == palabra):
-        Label_evalua.configure(text="Correcto")
+        Label_evalua.configure(text="Correcto",font=("Arial",16))
         Label_evalua.pack()
     else:
-        texto = "Incorrecto \n La palabra correcta es: {}".format(c)
-        Label_evalua.configure(text=texto)
+        texto = "Incorrecto \n La palabra correcta es: \n {} \n ".format(c)
+        Label_evalua.configure(text=texto,font=("Arial",16))
         Label_evalua.pack()
-    boton_again = tk.Button(ventana, text="Otra vez", command=cambio_texto)
+    boton_again = tk.Button(ventana, text="Otra vez",font=("Arial",16), command=cambio_texto)
     boton_again.pack()
 
 def inicio():
     limpiar_ventana()
     c = ""
 
-    Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary",font=("Arial",18),padx=20,pady=10)
+    Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary\n ",font=("Arial",18),padx=20,pady=10)
     Label_texto_intro.pack()
      
     boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=define_juego)
