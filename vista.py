@@ -43,8 +43,16 @@ def datos_entrenamiento():
         conexion = connect_to_db()
         cursor = conexion.cursor()
         sql = f"INSERT IGNORE INTO {table_name} (Eng, Esp) VALUES (%s, %s)"
+        check_query = f"SELECT * FROM {table_name} WHERE Eng = %s OR Esp = %s"
         valores = entry_eng.get(), entry_esp.get()
         try:
+			# 1. Check if the word already exists
+            cursor.execute(check_query, valores)
+
+            if cursor.fetchone():
+                print(f"Word '{valores}' already exists. Skipping insert.")
+                return False
+
             cursor.execute(sql, valores)
             conexion.commit()
             messagebox.showinfo('Información', 'Registro insertado con éxito')
