@@ -23,6 +23,26 @@ def connect_to_db():
         input("Presiona Enter para cerrar...")
         return None
 
+def menu():
+    ventana.title("Menu Demo")
+
+    # Create the menubar
+    menubar = tk.Menu(ventana)
+    ventana.config(menu=menubar)
+
+    # Create a File menu
+    file_menu = tk.Menu(menubar, tearoff=False)
+    file_menu.add_command(label="Start", command=inicio)
+    file_menu.add_command(label="Exit", command=ventana.quit)
+    menubar.add_cascade(label="File", menu=file_menu)
+
+    # Create a Help menu
+    """
+    help_menu = tk.Menu(menubar, tearoff=False)
+    help_menu.add_command(label="Back", command=back)
+    menubar.add_cascade(label="Back", menu=help_menu)
+    """
+
 def define_datos():
     global bandera
     bandera = "datos"
@@ -154,6 +174,7 @@ def datos_entrenamiento():
         finally:
             conexion.close()
     limpiar_ventana()
+    menu()
     tk.Label(ventana,text="Index").grid(column=0,row=0)
     entry_index= tk.Entry(ventana)
     entry_index.grid(column=0,row=1)
@@ -175,6 +196,7 @@ def datos_entrenamiento():
 
 def cambio_tema():
     limpiar_ventana()
+    menu()
     Label_texto_ejercicio= tk.Label(ventana, text="Seleccione el tipo de ejercicio\n ",font=("Arial",16)).pack()
     boton_cambio_idioms= tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_words= tk.Button(ventana, text="",font=("Arial", 16))
@@ -205,6 +227,7 @@ def limpiar_ventana():
 
 def cambio_texto():
     limpiar_ventana()
+    menu()
     Label_texto_traduccion = tk.Label(ventana, text="Seleccione el modo de traducción\n ",font=("Arial",16)).pack()
     boton_cambio_espanol = tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_espanol.configure(text="Spanish",command=lambda:play_eng_esp("Spa"))
@@ -257,12 +280,7 @@ def elige():
     try:
         db = connect_to_db()
         cursor = db.cursor()
-        cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
-        cantidad = cursor.fetchone()[0]
-        aleatorio = randint(1, cantidad)
-        cursor.execute(
-            f"SELECT * FROM {table_name} WHERE `index` = {aleatorio}"
-        )
+        cursor.execute(f"SELECT * FROM {table_name} ORDER BY RAND() LIMIT 1")
         myresult = cursor.fetchone()
         if myresult is None:
             return []
