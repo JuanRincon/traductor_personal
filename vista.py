@@ -1,12 +1,15 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from random import randint
 import mysql.connector
 from mysql.connector import errors, Error
 
 ventana = tk.Tk()
 
 table_name = "" 
+history_back = []
+history_forward = []
+current_page = None
+bandera = ""
 
 def connect_to_db():
     try:
@@ -32,26 +35,66 @@ def menu():
 
     # Create a File menu
     file_menu = tk.Menu(menubar, tearoff=False)
-    file_menu.add_command(label="Start", command=inicio)
+    file_menu.add_command(label="Start", command=lambda: navegar(inicio))
     file_menu.add_command(label="Exit", command=ventana.quit)
     menubar.add_cascade(label="File", menu=file_menu)
 
-    # Create a Help menu
-    """
-    help_menu = tk.Menu(menubar, tearoff=False)
-    help_menu.add_command(label="Back", command=back)
-    menubar.add_cascade(label="Back", menu=help_menu)
-    """
+    # Create a navigate menu
+    navi_menu = tk.Menu(menubar, tearoff=False)
+    navi_menu.add_command(label="Back", command=backward)
+    navi_menu.add_command(label="Forward", command=forward)
+    menubar.add_cascade(label="Navigate", menu=navi_menu)
 
-def define_datos():
-    global bandera
-    bandera = "datos"
-    cambio_tema()
+def navegar(funcion_destino, *args, **kwargs):
+    global current_page
 
-def define_juego():
-    global bandera
-    bandera = "juego"
-    cambio_tema()
+    if current_page is not None:
+        history_back.append(current_page)
+
+    history_forward.clear()
+
+    current_page = {
+        "func": funcion_destino,
+        "args": args,
+        "kwargs": kwargs
+    }
+
+    funcion_destino(*args, **kwargs)
+
+def backward():
+    global current_page
+
+    if not history_back:
+        return
+
+    history_forward.append(current_page)
+
+    current_page = history_back.pop()
+
+    limpiar_ventana()
+
+    current_page["func"](
+        *current_page["args"],
+        **current_page["kwargs"]
+    )
+
+
+def forward():
+    global current_page
+
+    if not history_forward:
+        return
+
+    history_back.append(current_page)
+
+    current_page = history_forward.pop()
+
+    limpiar_ventana()
+
+    current_page["func"](
+        *current_page["args"],
+        **current_page["kwargs"]
+    )
 
 def datos_entrenamiento():
     def limpiar_campos():
@@ -194,9 +237,11 @@ def datos_entrenamiento():
     tk.Button(ventana,text="Limpiar", command=limpiar_campos).grid(column=3, row=1)
     tk.Button(ventana,text="Mostrar todo", command=mostrar_todo).grid(column=3, row=0)
 
-def cambio_tema():
+def cambio_tema(define):
     limpiar_ventana()
     menu()
+    global bandera
+    bandera = define
     Label_texto_ejercicio= tk.Label(ventana, text="Seleccione el tipo de ejercicio\n ",font=("Arial",16)).pack()
     boton_cambio_idioms= tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_words= tk.Button(ventana, text="",font=("Arial", 16))
@@ -204,23 +249,17 @@ def cambio_tema():
     boton_cambio_reinforcement= tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_sentences= tk.Button(ventana, text="",font=("Arial", 16))
 
-    boton_cambio_words.configure(text="Words", command=words)
+    boton_cambio_words.configure(text="Words", command=lambda: navegar(words))
     boton_cambio_words.pack(padx=20,pady=5)
-    boton_cambio_idioms.configure(text="Idioms", command=idioms)
+    boton_cambio_idioms.configure(text="Idioms", command=lambda: navegar(idioms))
     boton_cambio_idioms.pack(padx=20,pady=5)
-    boton_cambio_verbs.configure(text="Phrasal verbs", command=verbs)
+    boton_cambio_verbs.configure(text="Phrasal verbs", command=lambda: navegar(verbs))
     boton_cambio_verbs.pack(padx=20,pady=5)
-    boton_cambio_reinforcement.configure(text="Reinforcement", command=reinforcement)
+    boton_cambio_reinforcement.configure(text="Reinforcement", command=lambda: navegar(reinforcement))
     boton_cambio_reinforcement.pack(padx=20,pady=5)
-    boton_cambio_sentences.configure(text="Sentences", command=sentences)
+    boton_cambio_sentences.configure(text="Sentences", command=lambda: navegar(sentences))
     boton_cambio_sentences.pack(padx=20,pady=5)
 	
-def ocultar_boton():
-    # Oculta el botón usando el mismo gestor con el que fue creado (pack, grid o place)
-    boton_again.pack_forget()
-    # Pare refrescar la ventana después de ocultar el botón
-    ventana.update()
-
 def limpiar_ventana():
     for widget in ventana.winfo_children():
         widget.destroy()
@@ -230,10 +269,10 @@ def cambio_texto():
     menu()
     Label_texto_traduccion = tk.Label(ventana, text="Seleccione el modo de traducción\n ",font=("Arial",16)).pack()
     boton_cambio_espanol = tk.Button(ventana, text="",font=("Arial", 16))
-    boton_cambio_espanol.configure(text="Spanish",command=lambda:play_eng_esp("Spa"))
+    boton_cambio_espanol.configure(text="Spanish",command=lambda: navegar(play_eng_esp,"Spa"))
     boton_cambio_espanol.pack(padx=20,pady=5)
     boton_cambio_ingles = tk.Button(ventana, text="",font=("Arial", 16))
-    boton_cambio_ingles.configure( text="English",command=lambda:play_eng_esp("Eng"))
+    boton_cambio_ingles.configure( text="English",command=lambda: navegar(play_eng_esp,"Eng"))
     boton_cambio_ingles.pack(padx=20,pady=5)
 
 def words():
@@ -288,30 +327,67 @@ def elige():
         db.close()
         return myresult
     except Exception as ex:
-        raise
+        print("ERROR:", ex)
+        return[]
 
-def play_eng_esp(y):
+def play_eng_esp(y, palabras=None):
     limpiar_ventana()
-    palabras = elige()
-    palabras =  {
+    menu()
+
+    # Si no tenemos una palabra guardada,
+    # seleccionamos una nueva.
+    if palabras is None:
+
+        palabras = elige()
+
+        if not palabras:
+            messagebox.showwarning(
+                "Aviso",
+                "No existen registros en la tabla."
+            )
+            navegar(inicio)
+            return
+
+        palabras = {
             "Eng": palabras[1],
             "Esp": palabras[2]
-    }
-    palabras = dict(palabras)
+        }
+
+        # Guardamos la palabra seleccionada en la página actual
+        current_page["args"] = (y, palabras)
+
     global c
     global e
+
     if y == "Spa":
-        d = palabras['Esp']
-        c = palabras['Eng']
-        texto = "La palabra a traducir es: \n\n {}\n ".format(d)
+        d = palabras["Esp"]
+        c = palabras["Eng"]
+        texto = "La palabra a traducir es: \n\n{}\n ".format(d)
+
     elif y == "Eng":
-        d = palabras['Eng']
-        c = palabras['Esp']
-        texto = "The word to translate is: \n\n {}\n ".format(d)
-    Label_texto_play = tk.Label(ventana, text=texto,font=("Arial",16)).pack()
-    e = tk.Entry(ventana, text="\n", width=40)
+        d = palabras["Eng"]
+        c = palabras["Esp"]
+        texto = "The word to translate is: \n\n{}\n ".format(d)
+
+    Label_texto_play = tk.Label(
+        ventana,
+        text=texto,
+        font=("Arial", 16)
+    )
+    Label_texto_play.pack()
+
+    e = tk.Entry(
+        ventana,
+        width=40
+    )
     e.pack()
-    boton_confirmar = tk.Button(ventana, text="Confirmar",font=("Arial",16), command=valor_entrada)
+
+    boton_confirmar = tk.Button(
+        ventana,
+        text="Confirmar",
+        font=("Arial", 16),
+        command=valor_entrada
+    )
     boton_confirmar.pack(side=tk.BOTTOM)
 
 def valor_entrada():
@@ -320,6 +396,7 @@ def valor_entrada():
     return evalua(palabra)
 
 def evalua(palabra):
+    menu()
     Label_evalua = tk.Label(ventana, text="")
     if (c == palabra):
         Label_evalua.configure(text="Correcto",font=("Arial",16))
@@ -328,7 +405,7 @@ def evalua(palabra):
         texto = "Incorrecto \n La palabra correcta es: \n {} \n ".format(c)
         Label_evalua.configure(text=texto,font=("Arial",16))
         Label_evalua.pack()
-    boton_again = tk.Button(ventana, text="Otra vez",font=("Arial",16), command=cambio_texto)
+    boton_again = tk.Button(ventana, text="Otra vez",font=("Arial",16), command=lambda: navegar(cambio_texto))
     boton_again.pack()
 
 def inicio():
@@ -338,10 +415,9 @@ def inicio():
     Label_texto_intro = tk.Label(ventana, text="Welcome to Englis Vocabulary \nYour app to practice your\npersonal vocabulary\n ",font=("Arial",18),padx=20,pady=10)
     Label_texto_intro.pack()
      
-    boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=define_juego)
+    boton_start = tk.Button(ventana, text="Press to start",font=("Arial",16),command=lambda: navegar(cambio_tema, "juego"))
     boton_start.pack(padx=20,pady=5)
-    boton_datos = tk.Button(ventana, text="Ingresa nuevos datos",font=("Arial",16),command=define_datos)
-    boton_start.pack(padx=20,pady=5)
+    boton_datos = tk.Button(ventana, text="Ingresa nuevos datos",font=("Arial",16),command=lambda: navegar(cambio_tema, "datos"))
     boton_datos.pack(padx=20,pady=5)
 
     mensaje_label = tk.Label(ventana,text="",font=("Arial",18))
