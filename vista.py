@@ -102,6 +102,13 @@ def datos_entrenamiento():
         entry_eng.delete(0, tk.END)
         entry_esp.delete(0, tk.END)
 
+    def enviar_a():
+        global variable1, variable2
+        variable1 = entry_eng.get()
+        variable2 = entry_esp.get()
+        eliminar()
+        cambio_tema("cambio")
+
     def insertar():
         conexion = connect_to_db()
         cursor = conexion.cursor()
@@ -188,6 +195,7 @@ def datos_entrenamiento():
     
     def mostrar_todo():
         limpiar_ventana()
+        menu()
         conexion = connect_to_db()
         if not conexion:
             return
@@ -235,6 +243,7 @@ def datos_entrenamiento():
     tk.Button(ventana,text="Editar", command=editar).grid(column=2, row=2)
     tk.Button(ventana,text="Eliminar", command=eliminar).grid(column=3, row=2)
     tk.Button(ventana,text="Limpiar", command=limpiar_campos).grid(column=3, row=1)
+    tk.Button(ventana,text="Enviar a", command=enviar_a).grid(column=4, row=1)
     tk.Button(ventana,text="Mostrar todo", command=mostrar_todo).grid(column=3, row=0)
 
 def cambio_tema(define):
@@ -249,15 +258,15 @@ def cambio_tema(define):
     boton_cambio_reinforcement= tk.Button(ventana, text="",font=("Arial", 16))
     boton_cambio_sentences= tk.Button(ventana, text="",font=("Arial", 16))
 
-    boton_cambio_words.configure(text="Words", command=lambda: navegar(words))
+    boton_cambio_words.configure(text="Words", command=lambda: navegar(selecciona, "words"))
     boton_cambio_words.pack(padx=20,pady=5)
-    boton_cambio_idioms.configure(text="Idioms", command=lambda: navegar(idioms))
+    boton_cambio_idioms.configure(text="Idioms", command=lambda: navegar(selecciona, "idioms"))
     boton_cambio_idioms.pack(padx=20,pady=5)
-    boton_cambio_verbs.configure(text="Phrasal verbs", command=lambda: navegar(verbs))
+    boton_cambio_verbs.configure(text="Phrasal verbs", command=lambda: navegar(selecciona, "verbs"))
     boton_cambio_verbs.pack(padx=20,pady=5)
-    boton_cambio_reinforcement.configure(text="Reinforcement", command=lambda: navegar(reinforcement))
+    boton_cambio_reinforcement.configure(text="Reinforcement", command=lambda: navegar(selecciona, "reinforcement"))
     boton_cambio_reinforcement.pack(padx=20,pady=5)
-    boton_cambio_sentences.configure(text="Sentences", command=lambda: navegar(sentences))
+    boton_cambio_sentences.configure(text="Sentences", command=lambda: navegar(selecciona, "sentences"))
     boton_cambio_sentences.pack(padx=20,pady=5)
 	
 def limpiar_ventana():
@@ -275,45 +284,35 @@ def cambio_texto():
     boton_cambio_ingles.configure( text="English",command=lambda: navegar(play_eng_esp,"Eng"))
     boton_cambio_ingles.pack(padx=20,pady=5)
 
-def words():
+def selecciona(tipo):
     global table_name
-    table_name="words"
+    table_name=tipo
     if bandera == "datos":
         datos_entrenamiento()
-    else:
+    elif bandera == "juego": 
         cambio_texto()
+    elif bandera == "cambio":
+        conexion = connect_to_db()
+        cursor = conexion.cursor()
+        sql = f"INSERT IGNORE INTO {table_name} (Eng, Esp) VALUES (%s, %s)"
+        check_query = f"SELECT * FROM {table_name} WHERE Eng = %s OR Esp = %s"
+        valores = variable1, variable2
+        try:
+			# 1. Check if the word already exists
+            cursor.execute(check_query, valores)
 
-def idioms():
-    global table_name
-    table_name="idioms"
-    if bandera == "datos":
-        datos_entrenamiento()
-    else:
-        cambio_texto()
+            if cursor.fetchone():
+                print(f"Word '{valores}' already exists. Skipping insert.")
+                return False
 
-def verbs():
-    global table_name
-    table_name="phrasal_verbs"
-    if bandera == "datos":
-        datos_entrenamiento()
-    else:
-        cambio_texto()
-
-def reinforcement():
-    global table_name
-    table_name="reinforcement"
-    if bandera == "datos":
-        datos_entrenamiento()
-    else:
-        cambio_texto()
-
-def sentences():
-    global table_name
-    table_name="sentences"
-    if bandera == "datos":
-        datos_entrenamiento()
-    else:
-        cambio_texto()
+            cursor.execute(sql, valores)
+            conexion.commit()
+            messagebox.showinfo('Información', 'Registro insertado con éxito')
+        except Error as e:
+            messagebox.showerror('Error', str(e))
+        finally:
+            conexion.close()
+        inicio() 
 
 def elige():
     try:
