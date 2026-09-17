@@ -26,6 +26,14 @@ def connect_to_db():
         input("Presiona Enter para cerrar...")
         return None
 
+def reordenarIndices(table_name):
+    conexion = connect_to_db()
+    cursor = conexion.cursor()
+    cursor.callproc("ReordenarIndices", [table_name])
+    conexion.commit()
+    messagebox.showinfor("Exito", f"Se reordenó la tabla '{table_name}'.")
+    cursor.close()
+
 def menu():
     ventana.title("Menu Demo")
 
@@ -201,8 +209,8 @@ def datos_entrenamiento():
             return
         tabla = ttk.Treeview(ventana, show="headings")
         tabla.pack(fill="both", expand=True)
-        boton_inicio = tk.Button(ventana, text="Inicio", command=inicio)
-        boton_inicio.pack()
+        boton_reordenar = tk.Button(ventana, text="Reordenar", command=lambda:reordenarIndices(table_name))
+        boton_reordenar.pack()
         try:
             cursor = conexion.cursor()
             cursor.execute(f"SELECT * FROM {table_name}")
@@ -262,7 +270,7 @@ def cambio_tema(define):
     boton_cambio_words.pack(padx=20,pady=5)
     boton_cambio_idioms.configure(text="Idioms", command=lambda: navegar(selecciona, "idioms"))
     boton_cambio_idioms.pack(padx=20,pady=5)
-    boton_cambio_verbs.configure(text="Phrasal verbs", command=lambda: navegar(selecciona, "verbs"))
+    boton_cambio_verbs.configure(text="Phrasal verbs", command=lambda: navegar(selecciona, "phrasal_verbs"))
     boton_cambio_verbs.pack(padx=20,pady=5)
     boton_cambio_reinforcement.configure(text="Reinforcement", command=lambda: navegar(selecciona, "reinforcement"))
     boton_cambio_reinforcement.pack(padx=20,pady=5)
@@ -303,7 +311,8 @@ def selecciona(tipo):
 
             if cursor.fetchone():
                 print(f"Word '{valores}' already exists. Skipping insert.")
-                return False
+                messagebox.showinfo('Información', 'El registro ya existe')
+                return inicio()
 
             cursor.execute(sql, valores)
             conexion.commit()
